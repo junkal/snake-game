@@ -9,16 +9,30 @@ body {
     font-family: sans-serif;
 }
 
-.gameWrapper {
+.infoBar {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 15px;
+    color: #fff;
+    font-size: 18px;
+}
+
+#scoreDisplay {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
 }
 
-#scoreDisplay {
-    margin-bottom: 15px;
-    font-size: 18px;
-    color: #fff;
+#timerDisplay {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#targetDisplay {
+    /* text-align: center; */
+    align-items: flex-center;
 }
 
 canvas {

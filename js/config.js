@@ -15,5 +15,6 @@ export const CONFIG = {
     colors: {
         snake: '#0f0',
         apple: '#f00'
-    }
+    },
+    timeLimit: 60
 };

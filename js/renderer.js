@@ -14,7 +14,7 @@ export class Renderer {
             this.ctx.fillRect(0, 0, width, height);
         }
     }
-
+    
     drawApple(x, y) {
         const size = CONFIG.grid.tileSize;
         const img = this.assets.apple;
@@ -55,6 +55,17 @@ export class Renderer {
         this.ctx.fillStyle = '#fff';
         this.ctx.font = '16px sans-serif';
         this.ctx.fillText(`Score: ${score}`, 10, 20);
+    }
+
+    drawPauseOverlay(canvasWidth, canvasHeight) {
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = '40px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('⏸ Paused ⏸', canvasWidth / 2, canvasHeight / 2);
+        this.ctx.font = '18px sans-serif';
+        this.ctx.fillText('Press P to unpause the game', canvasWidth / 2, canvasHeight / 2 + 50);
     }
 
     drawGameOver(canvasWidth, canvasHeight) {

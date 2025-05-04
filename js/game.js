@@ -4,21 +4,29 @@ import { Apple } from './apple.js';
 import { AssetManager } from './assetManager.js';
 import { Renderer } from './renderer.js';
 
+const GAME_STATE = {
+    START: 'start',
+    RUNNING: 'running',
+    PAUSED: 'paused',
+    GAME_OVER: 'game_over'
+};
+
 export class Game {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
-
         const tileSize = CONFIG.grid.tileSize;
         const tileCountX = CONFIG.grid.tileCountX;
         const tileCountY = CONFIG.grid.tileCountY;
-
         this.canvas.width = tileSize * tileCountX;
         this.canvas.height = tileSize * tileCountY;
-
         this.assets = new AssetManager();
         this.renderer = new Renderer(this.ctx, this.assets);
-
+        this.timeLimit = CONFIG.timeLimit
+        this.remainingTime = this.timeLimit;
+        this.lastUpdateTime = Date.now();
+        this.targetScore = 100;        
+        this.state = GAME_STATE.START;
         this.init();
         this.handleInput();
     }
@@ -27,39 +35,68 @@ export class Game {
         const midX = Math.floor(CONFIG.grid.tileCountX / 2);
         const midY = Math.floor(CONFIG.grid.tileCountY / 2);
 
+        // restart the timer
+        this.timeLimit = CONFIG.timeLimit;
+        this.remainingTime = this.timeLimit;
+        this.lastUpdateTime = Date.now();
+        
         this.snake = new Snake(midX, midY);
         this.apple = new Apple();
         this.apple.placeRandom();
         this.score = 0;
-        this.gameOver = false;
+        this.state = GAME_STATE.RUNNING;
     }
 
     handleInput() {
         document.addEventListener("keydown", e => {
-            if (this.gameOver) {
+            if (this.state === GAME_STATE.GAME_OVER) {
                 this.reset();
                 return;
             }
-
-            switch (e.key) {
-                case "ArrowUp":
-                    this.snake.setDirection({ x: 0, y: -1 });
-                    break;
-                case "ArrowDown":
-                    this.snake.setDirection({ x: 0, y: 1 });
-                    break;
-                case "ArrowLeft":
-                    this.snake.setDirection({ x: -1, y: 0 });
-                    break;
-                case "ArrowRight":
-                    this.snake.setDirection({ x: 1, y: 0 });
-                    break;
+            // if pause key
+            if (e.key === 'p' || e.key === 'P') {
+                if (this.state === GAME_STATE.RUNNING) {
+                    this.state = GAME_STATE.PAUSED;
+                } else if (this.state === GAME_STATE.PAUSED) {
+                    this.state = GAME_STATE.RUNNING;
+                }
+                return;
+            }
+            // if arrow keys
+            if (this.state === GAME_STATE.RUNNING){
+                switch (e.key) {
+                    case "ArrowUp":
+                        this.snake.setDirection({ x: 0, y: -1 });
+                        break;
+                    case "ArrowDown":
+                        this.snake.setDirection({ x: 0, y: 1 });
+                        break;
+                    case "ArrowLeft":
+                        this.snake.setDirection({ x: -1, y: 0 });
+                        break;
+                    case "ArrowRight":
+                        this.snake.setDirection({ x: 1, y: 0 });
+                        break;
+                }
             }
         });
     }
 
     update() {
-        if (this.gameOver || (this.snake.direction.x === 0 && this.snake.direction.y === 0)) return;
+        if (this.state !== GAME_STATE.RUNNING) return;
+
+        const now = Date.now();
+        const delta = (now - this.lastUpdateTime) / 1000;
+        this.remainingTime -= delta;
+        this.lastUpdateTime = now;
+
+        if (this.remainingTime <= 0 && this.score < this.targetScore) {
+            this.state = GAME_STATE.GAME_OVER;
+            this.assets.gameOverSound.play();
+            return;
+        }
+
+        if (this.state === GAME_STATE.GAME_OVER || (this.snake.direction.x === 0 && this.snake.direction.y === 0)) return;
 
         const head = this.snake.move();
 
@@ -73,7 +110,7 @@ export class Game {
         }
 
         if (this.isGameOver()) {
-            this.gameOver = true;
+            this.state = GAME_STATE.GAME_OVER;
             this.assets.gameOverSound.play();
         }
     }
@@ -84,10 +121,14 @@ export class Game {
         this.renderer.drawApple(this.apple.x, this.apple.y);
     
         document.getElementById("scoreDisplay").textContent = `Score: ${this.score}`;
-    
-        if (this.gameOver) {
+        document.getElementById("timerDisplay").textContent = `Time Left: ${Math.ceil(this.remainingTime)}s`;
+
+        if (this.state === GAME_STATE.GAME_OVER) {
             this.renderer.drawGameOver(this.canvas.width, this.canvas.height);
         }
+        if (this.state === GAME_STATE.PAUSED) {
+            this.renderer.drawPauseOverlay(this.canvas.width, this.canvas.height);
+        }        
     }
 
     isGameOver() {
