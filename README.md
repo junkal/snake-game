@@ -1,4 +1,4 @@
-# 🐍 Snake Game – Arcade Classic Reinvented
+# 🐍 Snake Game – Arcade Classic Reinvented (JavaScript + HTML5)
 
 This version of **Snake Game** is done using **JavaScript + HTML5 Canvas** and is meant to run on a modern browser. The game rule is based on the retro arcade version.
 
