@@ -16,5 +16,7 @@ export const CONFIG = {
         snake: '#0f0',
         apple: '#f00'
     },
-    timeLimit: 60
+    timeLimit: 80,
+    targetScore: 80,
+    maxlevel: 5
 };

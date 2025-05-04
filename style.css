@@ -11,28 +11,14 @@ body {
 
 .infoBar {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 15px;
+    justify-content: space-between; 
+    align-items: center;
+    gap: 20px;
     color: #fff;
     font-size: 18px;
-}
-
-#scoreDisplay {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-#timerDisplay {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-#targetDisplay {
-    /* text-align: center; */
-    align-items: flex-center;
+    margin-bottom: 10px;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 canvas {

@@ -68,6 +68,19 @@ export class Renderer {
         this.ctx.fillText('Press P to unpause the game', canvasWidth / 2, canvasHeight / 2 + 50);
     }
 
+    drawLevelClearScreen(canvasWidth, canvasHeight, nextLevel) {
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        this.ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = 'bold 36px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(`Level ${nextLevel} Cleared!`, canvasWidth / 2, canvasHeight / 2 - 20);
+    
+        this.ctx.font = '18px sans-serif';
+        this.ctx.fillText('Press Enter to continue...', canvasWidth / 2, canvasHeight / 2 + 20);
+    }
+
     drawGameOver(canvasWidth, canvasHeight) {
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
         this.ctx.fillRect(0, 0, canvasWidth, canvasHeight);

@@ -3,8 +3,6 @@ import { CONFIG } from './config.js';
 
 const game = new Game("gameCanvas");
 
-document.getElementById("timerDisplay").textContent = `Time Left: ${CONFIG.timeLimit}s`;
-
 let gameStarted = false;
 let gameInterval = null;
 

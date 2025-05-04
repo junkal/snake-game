@@ -3,12 +3,14 @@ import { Snake } from './snake.js';
 import { Apple } from './apple.js';
 import { AssetManager } from './assetManager.js';
 import { Renderer } from './renderer.js';
+import { LevelManager } from './levelManager.js';
 
 const GAME_STATE = {
     START: 'start',
     RUNNING: 'running',
     PAUSED: 'paused',
-    GAME_OVER: 'game_over'
+    GAME_OVER: 'game_over',
+    LEVEL_CLEARED: 'level_cleared'
 };
 
 export class Game {
@@ -22,10 +24,7 @@ export class Game {
         this.canvas.height = tileSize * tileCountY;
         this.assets = new AssetManager();
         this.renderer = new Renderer(this.ctx, this.assets);
-        this.timeLimit = CONFIG.timeLimit
-        this.remainingTime = this.timeLimit;
-        this.lastUpdateTime = Date.now();
-        this.targetScore = 100;        
+        this.levelManager = new LevelManager();
         this.state = GAME_STATE.START;
         this.init();
         this.handleInput();
@@ -35,15 +34,18 @@ export class Game {
         const midX = Math.floor(CONFIG.grid.tileCountX / 2);
         const midY = Math.floor(CONFIG.grid.tileCountY / 2);
 
-        // restart the timer
-        this.timeLimit = CONFIG.timeLimit;
-        this.remainingTime = this.timeLimit;
-        this.lastUpdateTime = Date.now();
-        
         this.snake = new Snake(midX, midY);
         this.apple = new Apple();
         this.apple.placeRandom();
         this.score = 0;
+        this.win = false;
+
+        // restart the timer and level-specific settings
+        this.timeLimit = this.levelManager.getCurrentTimeLimit();
+        this.remainingTime = this.timeLimit;
+        this.targetScore = this.levelManager.targetScore;
+        this.lastUpdateTime = Date.now();
+
         this.state = GAME_STATE.RUNNING;
     }
 
@@ -62,6 +64,14 @@ export class Game {
                 }
                 return;
             }
+
+            // if level cleared and ENTER key
+            if (this.state === GAME_STATE.LEVEL_CLEARED && e.key === 'Enter') {
+                this.levelManager.advanceLevel();
+                this.init();
+                return;
+            }
+
             // if arrow keys
             if (this.state === GAME_STATE.RUNNING){
                 switch (e.key) {
@@ -96,6 +106,18 @@ export class Game {
             return;
         }
 
+        if (this.score >= this.targetScore) {
+            if (this.levelManager.isFinalLevel()) {
+                this.state = GAME_STATE.GAME_OVER;
+                this.win = true;
+                return;
+            } else {
+                this.state = GAME_STATE.LEVEL_CLEARED;
+            }
+
+            return;
+        }
+
         if (this.state === GAME_STATE.GAME_OVER || (this.snake.direction.x === 0 && this.snake.direction.y === 0)) return;
 
         const head = this.snake.move();
@@ -120,15 +142,26 @@ export class Game {
         this.renderer.drawSnake(this.snake);
         this.renderer.drawApple(this.apple.x, this.apple.y);
     
+        document.getElementById("levelDisplay").textContent =`Level: ${this.levelManager.level}`;
         document.getElementById("scoreDisplay").textContent = `Score: ${this.score}`;
         document.getElementById("timerDisplay").textContent = `Time Left: ${Math.ceil(this.remainingTime)}s`;
+        document.getElementById("targetDisplay").textContent = `Target Score: ${this.targetScore}`;
 
         if (this.state === GAME_STATE.GAME_OVER) {
+            if (this.win) {
+                this.renderer.drawWinScreen(this.canvas.width, this.canvas.height);
+                return;
+            }
             this.renderer.drawGameOver(this.canvas.width, this.canvas.height);
         }
+
+        if (this.state === GAME_STATE.LEVEL_CLEARED) {
+            this.renderer.drawLevelClearScreen(this.canvas.width, this.canvas.height, this.levelManager.level);
+        }
+
         if (this.state === GAME_STATE.PAUSED) {
             this.renderer.drawPauseOverlay(this.canvas.width, this.canvas.height);
-        }        
+        }
     }
 
     isGameOver() {
