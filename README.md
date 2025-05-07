@@ -42,17 +42,19 @@ The gameplay looks like this
 <p align="center">
   <img 
     alt="Gameplay-Screen"
-    src="https://github.com/user-attachments/assets/394ec083-7f72-4e86-963b-6d321810caf7"
+    src="https://github.com/user-attachments/assets/81f21204-7182-4404-b666-1941b2b4baf9"
     style="width: 60%; height: auto;"
   />
 </p>
 
-Reach **100 points** before the timer runs out!
+Reach **Target Score** before the timer runs out!
 - Use `Arrow Keys` to move
 - Press `Enter` to start
 - Press `P` to pause/resume
 - Eat apples, gain points, beat the timer!
-  
+
+Once the Target Score is achieved and within countdown time, the game will progress to next level with reduced countdown time and higher target score. There are a total of 5 levels.
+
 I've deployed and hosted this game on Github. The link to the game can be found [here](https://junkal.github.io/snake-game/)
 
 ---
